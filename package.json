@@ -1,0 +1,28 @@
+{
+  "name": "babel-plugin-transform-media-imports",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "mocha --require @babel/register --require choma"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-export-default-from": "^7.5.2",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/register": "^7.5.5",
+    "choma": "^1.2.1",
+    "mocha": "^6.2.0",
+    "prettier": "^1.18.2"
+  },
+  "dependencies": {
+    "image-size": "^0.7.4",
+    "md5-file": "^4.0.0"
+  },
+  "prettier": {
+    "tabWidth": 4,
+    "singleQuote": true,
+    "printWidth": 90,
+    "bracketSpacing": false
+  }
+}
