@@ -1,11 +1,28 @@
 {
   "name": "babel-plugin-transform-media-imports",
   "version": "1.1.0",
+  "author": "Sidney Liebrand (https://sidneyliebrand.io)",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "test": "mocha --require @babel/register --require choma"
   },
+  "homepage": "https://github.com/SidOfc/babel-plugin-transform-media-imports",
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/SidOfc/babel-plugin-transform-media-imports"
+  },
+  "bugs": {
+      "url": "https://github.com/SidOfc/babel-plugin-transform-media-imports/issues"
+  },
+  "keywords": [
+      "transform",
+      "media",
+      "import",
+      "export",
+      "image",
+      "video"
+  ],
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/plugin-proposal-export-default-from": "^7.5.2",
