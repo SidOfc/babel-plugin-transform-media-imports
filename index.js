@@ -29,18 +29,18 @@ function videoSize(path) {
     return {width, height, type};
 }
 
-function createMediaObject(importedPath, {file, opts}) {
+function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
     const {root, filename} = file.opts;
-    const rootDir = opts.baseDir ? path.resolve(opts.baseDir) : process.cwd();
     const importingFileDir = filename ? path.dirname(filename) : root;
     const mediaPath = importedPath.startsWith('/')
         ? importedPath
         : path.resolve(path.join(importingFileDir, importedPath));
-    const isVideo = mediaPath.match(/(?:mp4|webm|ogv)$/);
+    const isVideo = mediaPath.match(opts.videoExtensionRegex);
     const {width, height, type} = (isVideo ? videoSize : imgSize)(mediaPath);
-    let pathname = mediaPath.replace(rootDir, '');
+    let pathname = mediaPath.replace(opts.baseDir, '');
     let base64 = null;
 
+    if (opts.pathnamePrefix) pathname = path.join(opts.pathnamePrefix, pathname);
     if (opts.md5) {
         const splatOpts = opts.md5.constructor === Object ? opts.md5 : {};
         const {delimiter, length} = {delimiter: '-', length: 35, ...splatOpts};
@@ -89,6 +89,34 @@ function toBabelMediaObject(m, t) {
 
 module.exports = ({types: t}) => ({
     name: 'transform-media-imports',
+
+    pre() {
+        const {
+            baseDir = process.cwd(),
+            pathnamePrefix = '',
+            imageExtensions = ['svg', 'apng', 'png', 'gif', 'jpg', 'jpeg'],
+            videoExtensions = ['mp4', 'webm', 'ogv'],
+            md5 = false,
+            base64 = false
+        } = this.opts;
+
+        this.normalizedOpts = {
+            baseDir: path.resolve(baseDir),
+            pathnamePrefix,
+            imageExtensions,
+            videoExtensions,
+            md5,
+            base64,
+
+            imageExtensionRegex: new RegExp(`\.(?:${imageExtensions.join('|')})$`, 'i'),
+            videoExtensionRegex: new RegExp(`\.(?:${videoExtensions.join('|')})$`, 'i'),
+            extensionRegex: new RegExp(
+                '\\.(?:' + [...imageExtensions, ...videoExtensions].join('|') + ')$',
+                'i'
+            )
+        };
+    },
+
     visitor: {
         ExportNamedDeclaration(p) {
             const transforms = [];
@@ -98,7 +126,7 @@ module.exports = ({types: t}) => ({
                 source: {value: rawExportPath}
             } = p.node;
 
-            if (rawExportPath.match(/\.(?:svg|a?png|jpe?g|gif|webm|mp4|ogv)/i)) {
+            if (rawExportPath.match(this.normalizedOpts.extensionRegex)) {
                 const exps = specifiers.filter(t.isExportSpecifier);
                 const defaultExport =
                     specifiers.find(t.isExportDefaultSpecifier) ||
@@ -151,7 +179,7 @@ module.exports = ({types: t}) => ({
                 source: {value: rawImportPath}
             } = p.node;
 
-            if (rawImportPath.match(/\.(?:svg|a?png|jpe?g|gif|webm|mp4|ogv)/i)) {
+            if (rawImportPath.match(this.normalizedOpts.extensionRegex)) {
                 const defaultImport = specifiers.find(t.isImportDefaultSpecifier);
                 const namedImports = specifiers.filter(t.isImportSpecifier);
                 const media = toBabelMediaObject(

@@ -1,6 +1,4 @@
-# :construction: babel-plugin-transform-media-imports :construction:
-
-:warning: This plugin is still under construction and is **not completely functional!** :warning:
+# babel-plugin-transform-media-imports
 
 When building an application using server-side rendering, the need to
 calculate aspect ratio's from image or video files in order to prevent
@@ -70,17 +68,33 @@ Afterwards, add the plugin to your `.babelrc` plugins:
 
 ## Configuration
 
+This is the default configuration of the plugin:
+
+```js
+[
+    'transform-media-imports',
+    {
+        baseDir: process.cwd(),
+        pathnamePrefix: '',
+        imageExtensions: ['svg', 'apng', 'png', 'gif', 'jpg', 'jpeg'],
+        videoExtensions: ['mp4', 'webm', 'ogv'],
+        md5: false,
+        base64: false
+    }
+]
+```
+
 ### baseDir
 
-**default**: `'/assets'`
+**default**: `process.cwd()`
 
 Everything before this path gets removed from the `src` and `pathname` attributes.
 
-### outputPrefix
+### pathnamePrefix
 
-**default**: `'/assets'`
+**default**: `''`
 
-After removing the [`baseDir`](#basedir), the `outputPrefix` gets _prepended_ to
+After removing the [`baseDir`](#basedir), the `pathnamePrefix` gets _prepended_ to
 the `src` and `pathname` attributes.
 
 ### imageExtensions
@@ -91,7 +105,7 @@ Specify supported image extensions that will be transformed.
 
 ### videoExtensions
 
-**default**: `[mp4, webm, ogv]`
+**default**: `['mp4', 'webm', 'ogv']`
 
 Specify supported video extensions that will be transformed.
 

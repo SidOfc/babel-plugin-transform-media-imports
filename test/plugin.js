@@ -102,19 +102,68 @@ describe('babel-plugin-transform-media-imports', () => {
                 const code = transform(
                     'import {pathname} from "test/files/media-file.jpg"',
                     {
-                        baseDir: './test'
+                        baseDir: 'test'
                     }
                 );
 
                 assert.equal('var pathname = "/files/media-file.jpg";', code);
             });
 
-            it('removes root path from output pathname when empty / unspecified', () => {
+            it('removes process.cwd() from output pathname by default', () => {
                 const code = transform(
                     'import {pathname} from "test/files/media-file.jpg"'
                 );
 
                 assert.equal('var pathname = "/test/files/media-file.jpg";', code);
+            });
+        });
+
+        describe('pathnamePrefix', () => {
+            it('prepends pathnamePrefix if specified', () => {
+                const code = transform(
+                    'import {pathname} from "test/files/media-file.jpg"',
+                    {
+                        pathnamePrefix: '/assets'
+                    }
+                );
+
+                assert.equal('var pathname = "/assets/test/files/media-file.jpg";', code);
+            });
+
+            it('prepends nothing by default', () => {
+                const code = transform(
+                    'import {pathname} from "test/files/media-file.jpg"'
+                );
+
+                assert.equal('var pathname = "/test/files/media-file.jpg";', code);
+            });
+        });
+
+        describe('imageExtensions', () => {
+            it('does not transform when extension is not included in imageExtensions', () => {
+                const code = transform(
+                    'import {pathname} from "test/files/media-file.jpg"',
+                    {imageExtensions: []}
+                );
+
+                assert.equal(
+                    'import { pathname } from "test/files/media-file.jpg";',
+                    code
+                );
+            });
+        });
+
+        describe('videoExtensions', () => {
+            it('does not transform when extension is not included in videoExtensions', () => {
+                const code = transform(
+                    'import {pathname} from "test/files/media-file.webm"',
+                    {videoExtensions: []}
+                );
+
+                assert.equal(
+                    'import { pathname } from "test/files/media-file.webm";',
+                    code
+                );
             });
         });
 
