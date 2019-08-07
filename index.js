@@ -38,6 +38,8 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
     const isVideo = mediaPath.match(opts.videoExtensionRegex);
     const {width, height, type} = (isVideo ? videoSize : imgSize)(mediaPath);
     let pathname = mediaPath.replace(opts.baseDir, '');
+    let _fileBuffer = null;
+    let content = undefined;
     let base64 = null;
 
     if (opts.pathnamePrefix) pathname = path.join(opts.pathnamePrefix, pathname);
@@ -59,9 +61,14 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
         const {maxSize} = {maxSize: 8192, ...splatOpts};
 
         if (maxSize > fileSize) {
-            const b64str = Buffer.from(fs.readFileSync(mediaPath)).toString('base64');
+            _fileBuffer = fs.readFileSync(mediaPath);
+            const b64str = _fileBuffer.toString('base64');
             base64 = `data:${isVideo ? 'video' : 'image'}/${type};base64,${b64str}`;
         }
+    }
+
+    if (mediaPath.toLowerCase().endsWith('.svg')) {
+        content = (_fileBuffer || fs.readFileSync(mediaPath)).toString();
     }
 
     return {
@@ -71,6 +78,7 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
         height: height,
         aspectRatio: parseFloat((width / height).toFixed(3)),
         heightToWidthRatio: parseFloat((height / width).toFixed(3)),
+        content,
         type: type
     };
 }
@@ -83,6 +91,7 @@ function toBabelMediaObject(m, t) {
         width: t.numericLiteral(m.width),
         height: t.numericLiteral(m.height),
         aspectRatio: t.numericLiteral(m.aspectRatio),
+        content: m.content && t.stringLiteral(m.content),
         heightToWidthRatio: t.numericLiteral(m.heightToWidthRatio)
     };
 }
@@ -141,9 +150,9 @@ module.exports = ({types: t}) => ({
                     transforms.push(
                         t.exportDefaultDeclaration(
                             t.objectExpression(
-                                Object.entries(media).map(([k, v]) =>
-                                    t.objectProperty(t.identifier(k), v)
-                                )
+                                Object.entries(media)
+                                    .filter(([_, v]) => v)
+                                    .map(([k, v]) => t.objectProperty(t.identifier(k), v))
                             )
                         )
                     );
@@ -193,9 +202,11 @@ module.exports = ({types: t}) => ({
                             t.variableDeclarator(
                                 t.identifier(defaultImport.local.name),
                                 t.objectExpression(
-                                    Object.entries(media).map(([k, v]) =>
-                                        t.objectProperty(t.identifier(k), v)
-                                    )
+                                    Object.entries(media)
+                                        .filter(([_, v]) => v)
+                                        .map(([k, v]) =>
+                                            t.objectProperty(t.identifier(k), v)
+                                        )
                                 )
                             )
                         ])
