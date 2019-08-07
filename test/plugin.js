@@ -1,7 +1,10 @@
 import assert from 'assert';
 import * as babel from '@babel/core';
+import hasbin from 'hasbin';
 import fs from 'fs';
 import path from 'path';
+
+const ffprobeInstalled = hasbin.sync('ffprobe');
 
 function transform(code, options = {}) {
     return babel.transform(code, {
@@ -10,9 +13,9 @@ function transform(code, options = {}) {
     }).code;
 }
 
-describe('babel-plugin-transform-media-imports', () => {
-    describe('with @babel/plugin-proposal-export-default-from', () => {
-        it('can default export a media file using default export from', () => {
+describe('babel-plugin-transform-media-imports', function() {
+    describe('with @babel/plugin-proposal-export-default-from', function() {
+        it('can default export a media file using default export from', function() {
             const code = transform('export mediaFile from "test/files/media-file.jpg"');
 
             assert.equal(
@@ -33,26 +36,28 @@ describe('babel-plugin-transform-media-imports', () => {
         });
     });
 
-    it('can default export a media file using named exports', () => {
-        const code = transform('export {default} from "test/files/media-file.jpg"');
+    it('can default export a media file using named exports', function() {
+        if (!ffprobeInstalled) return this.skip();
+
+        const code = transform('export {default} from "test/files/media-file.webm"');
 
         assert.equal(
             [
                 'export default {',
-                '  pathname: "/test/files/media-file.jpg",',
-                '  src: "/test/files/media-file.jpg",',
-                '  type: "jpg",',
-                '  width: 280,',
-                '  height: 280,',
-                '  aspectRatio: 1,',
-                '  heightToWidthRatio: 1',
+                '  pathname: "/test/files/media-file.webm",',
+                '  src: "/test/files/media-file.webm",',
+                '  type: "webm",',
+                '  width: 768,',
+                '  height: 180,',
+                '  aspectRatio: 4.267,',
+                '  heightToWidthRatio: 0.234',
                 '};'
             ].join('\n'),
             code
         );
     });
 
-    it('can export a property from the media file', () => {
+    it('can export a property from the media file', function() {
         const code = transform(
             'export {width, height as h} from "test/files/media-file.jpg"'
         );
@@ -63,7 +68,7 @@ describe('babel-plugin-transform-media-imports', () => {
         );
     });
 
-    it('converts default import to object with information', () => {
+    it('converts default import to object with information', function() {
         const code = transform('import a from "test/files/media-file.jpg"');
 
         assert.equal(
@@ -82,7 +87,7 @@ describe('babel-plugin-transform-media-imports', () => {
         );
     });
 
-    it('converts named imports to variable declarations', () => {
+    it('converts named imports to variable declarations', function() {
         const code = transform(
             'import {pathname, width as aw, aspectRatio} from "test/files/media-file.jpg"'
         );
@@ -96,9 +101,9 @@ describe('babel-plugin-transform-media-imports', () => {
         );
     });
 
-    describe('options', () => {
-        describe('baseDir', () => {
-            it('removes provided baseDir from output pathname', () => {
+    describe('options', function() {
+        describe('baseDir', function() {
+            it('removes provided baseDir from output pathname', function() {
                 const code = transform(
                     'import {pathname} from "test/files/media-file.jpg"',
                     {
@@ -109,7 +114,7 @@ describe('babel-plugin-transform-media-imports', () => {
                 assert.equal('var pathname = "/files/media-file.jpg";', code);
             });
 
-            it('removes process.cwd() from output pathname by default', () => {
+            it('removes process.cwd() from output pathname by default', function() {
                 const code = transform(
                     'import {pathname} from "test/files/media-file.jpg"'
                 );
@@ -118,8 +123,8 @@ describe('babel-plugin-transform-media-imports', () => {
             });
         });
 
-        describe('pathnamePrefix', () => {
-            it('prepends pathnamePrefix if specified', () => {
+        describe('pathnamePrefix', function() {
+            it('prepends pathnamePrefix if specified', function() {
                 const code = transform(
                     'import {pathname} from "test/files/media-file.jpg"',
                     {
@@ -130,7 +135,7 @@ describe('babel-plugin-transform-media-imports', () => {
                 assert.equal('var pathname = "/assets/test/files/media-file.jpg";', code);
             });
 
-            it('prepends nothing by default', () => {
+            it('prepends nothing by default', function() {
                 const code = transform(
                     'import {pathname} from "test/files/media-file.jpg"'
                 );
@@ -139,8 +144,8 @@ describe('babel-plugin-transform-media-imports', () => {
             });
         });
 
-        describe('imageExtensions', () => {
-            it('does not transform when extension is not included in imageExtensions', () => {
+        describe('imageExtensions', function() {
+            it('does not transform when extension is not included in imageExtensions', function() {
                 const code = transform(
                     'import {pathname} from "test/files/media-file.jpg"',
                     {imageExtensions: []}
@@ -153,8 +158,8 @@ describe('babel-plugin-transform-media-imports', () => {
             });
         });
 
-        describe('videoExtensions', () => {
-            it('does not transform when extension is not included in videoExtensions', () => {
+        describe('videoExtensions', function() {
+            it('does not transform when extension is not included in videoExtensions', function() {
                 const code = transform(
                     'import {pathname} from "test/files/media-file.webm"',
                     {videoExtensions: []}
@@ -167,8 +172,8 @@ describe('babel-plugin-transform-media-imports', () => {
             });
         });
 
-        describe('md5', () => {
-            it('appends full md5 hash when {md5: true}', () => {
+        describe('md5', function() {
+            it('appends full md5 hash when {md5: true}', function() {
                 const code = transform(
                     'import {pathname} from "test/files/media-file.jpg"',
                     {
@@ -181,7 +186,7 @@ describe('babel-plugin-transform-media-imports', () => {
                 );
             });
 
-            it('can specify md5 length with {md5: {length: <positive number>}}', () => {
+            it('can specify md5 length with {md5: {length: <positive number>}}', function() {
                 const code = transform(
                     'import {pathname} from "test/files/media-file.jpg"',
                     {
@@ -195,7 +200,7 @@ describe('babel-plugin-transform-media-imports', () => {
                 );
             });
 
-            it('can specify md5 delimiter with {md5: {delimiter: <char>}}', () => {
+            it('can specify md5 delimiter with {md5: {delimiter: <char>}}', function() {
                 const code = transform(
                     'import {pathname} from "test/files/media-file.jpg"',
                     {
@@ -210,8 +215,8 @@ describe('babel-plugin-transform-media-imports', () => {
             });
         });
 
-        describe('base64', () => {
-            it('converts src attribute to base64 when {base64: true}', () => {
+        describe('base64', function() {
+            it('converts src attribute to base64 when {base64: true}', function() {
                 const code = transform('import {src} from "test/files/media-file.jpg"', {
                     base64: true
                 });
@@ -223,7 +228,7 @@ describe('babel-plugin-transform-media-imports', () => {
                 assert.equal(`var src = "data:image/jpg;base64,${b64str}";`, code);
             });
 
-            it('skips files > 8kb by default', () => {
+            it('skips files > 8kb by default', function() {
                 const code = transform('import {src} from "test/files/media-file.webm"', {
                     base64: true
                 });
@@ -231,7 +236,7 @@ describe('babel-plugin-transform-media-imports', () => {
                 assert.equal(`var src = "/test/files/media-file.webm";`, code);
             });
 
-            it('can override the maximum with {base64: {maxSize: <positive number>}}', () => {
+            it('can override the maximum with {base64: {maxSize: <positive number>}}', function() {
                 const code = transform('import {src} from "test/files/media-file.webm"', {
                     base64: {maxSize: 10000}
                 });
