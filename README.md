@@ -97,6 +97,13 @@ Everything before this path gets removed from the `src` and `pathname` attribute
 After removing the [`baseDir`](#basedir), the `pathnamePrefix` gets _prepended_ to
 the `src` and `pathname` attributes.
 
+### outputRoot
+
+**default**: `null`
+
+When specified, writes output file(s) to `outputRoot/{pathname}` where `pathname`
+is the specified media file's `pathname` attribute.
+
 ### imageExtensions
 
 **default**: `['svg', 'apng', 'png', 'gif', 'jpg', 'jpeg']`

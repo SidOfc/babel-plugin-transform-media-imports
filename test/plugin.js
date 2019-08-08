@@ -1,10 +1,9 @@
 import assert from 'assert';
 import * as babel from '@babel/core';
-import hasbin from 'hasbin';
+import {sync as executable} from 'hasbin';
 import fs from 'fs';
 import path from 'path';
-
-const ffprobeInstalled = hasbin.sync('ffprobe');
+import {execFileSync} from 'child_process';
 
 function transform(code, options = {}) {
     return babel.transform(code, {
@@ -15,7 +14,7 @@ function transform(code, options = {}) {
 
 describe('babel-plugin-transform-media-imports', function() {
     it('can default export a media file using named exports', function() {
-        if (!ffprobeInstalled) return this.skip();
+        if (!executable('ffprobe')) return this.skip();
 
         assert.equal(
             transform('export {default} from "test/files/media-file.webm"'),
@@ -114,6 +113,16 @@ describe('babel-plugin-transform-media-imports', function() {
             });
         });
 
+        describe('outputRoot', function() {
+            it('writes imported media file to specified directory', function() {
+                transform('import {pathname} from "test/files/media-file.svg"', {
+                    outputRoot: 'test/fake-root'
+                });
+
+                assert(fs.existsSync('test/fake-root/test/files/media-file.svg'));
+            });
+        });
+
         describe('imageExtensions', function() {
             it('does not transform when extension is not included in imageExtensions', function() {
                 assert.equal(
@@ -136,29 +145,56 @@ describe('babel-plugin-transform-media-imports', function() {
             });
         });
 
-        describe('md5', function() {
-            it('appends full md5 hash when {md5: true}', function() {
+        describe('hash', function() {
+            ['md5', 'sha256', 'sha224'].forEach(algo => {
+                it(`generates a valid ${algo} hash`, function() {
+                    const exe = algo + 'sum';
+                    if (!executable(exe)) return this.skip();
+
+                    const externalHash = execFileSync(exe, ['test/files/media-file.jpg'])
+                        .toString()
+                        .split(' ')[0];
+
+                    const pluginHash = (transform(
+                        'import {hash} from "test/files/media-file.jpg"',
+                        {hash: {algo}}
+                    ).match(/var hash = "([^"]+)"/i) || [])[1];
+
+                    assert.equal(externalHash, pluginHash);
+                });
+            });
+
+            it('appends md5 hash by default with {hash: true}', function() {
                 assert.equal(
                     transform('import {pathname} from "test/files/media-file.jpg"', {
-                        md5: true
+                        hash: true
                     }),
                     'var pathname = "/test/files/media-file-9554735b59274a729f35768ce68ed80a.jpg";'
                 );
             });
 
-            it('can specify md5 length with {md5: {length: <positive number>}}', function() {
+            it('can specify hash algo with {hash: {algo: <md5|sha1|...>}}', function() {
                 assert.equal(
                     transform('import {pathname} from "test/files/media-file.jpg"', {
-                        md5: {length: 10}
+                        hash: {algo: 'sha256', length: 64}
+                    }),
+                    'var pathname = "/test/files/media-file-9a9542d4c6ba999a740c27f9508529235cb8d6c83104231c8f42eaf5df268676.jpg";'
+                );
+            });
+
+            it('can specify hash length with {hash: {length: <positive number>}}', function() {
+                assert.equal(
+                    transform('import {pathname} from "test/files/media-file.jpg"', {
+                        hash: {length: 10}
                     }),
                     'var pathname = "/test/files/media-file-9554735b59.jpg";'
                 );
             });
 
-            it('can specify md5 delimiter with {md5: {delimiter: <char>}}', function() {
+            it('can specify hash delimiter with {hash: {delimiter: <char>}}', function() {
                 assert.equal(
                     transform('import {pathname} from "test/files/media-file.jpg"', {
-                        md5: {length: 10, delimiter: '.'}
+                        hash: {length: 10, delimiter: '.'}
                     }),
                     'var pathname = "/test/files/media-file.9554735b59.jpg";'
                 );

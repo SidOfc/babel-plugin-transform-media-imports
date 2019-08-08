@@ -1,7 +1,7 @@
 const path = require('path');
 const imgSize = require('image-size');
 const fs = require('fs');
-const md5 = require('md5-file');
+const crypto = require('crypto');
 const {execFileSync} = require('child_process');
 
 // get-video-dimensions package is async only which
@@ -35,23 +35,37 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
         ? importedPath
         : path.resolve(path.join(filename ? path.dirname(filename) : root, importedPath));
     const isVideo = mediaPath.match(opts.videoExtensionRegex);
+    const isSVG = mediaPath.toLowerCase().endsWith('.svg');
     const {width, height, type} = (isVideo ? videoSize : imgSize)(mediaPath);
 
     let pathname = mediaPath.replace(opts.baseDir, '');
-    let _fileBuffer = null;
+    let _fileBuffer;
+    const fileContents = () => (_fileBuffer = _fileBuffer || fs.readFileSync(mediaPath));
     let content = undefined;
     let base64 = null;
+    let hash = null;
 
+    if (isSVG) content = fileContents().toString();
     if (opts.pathnamePrefix) pathname = path.join(opts.pathnamePrefix, pathname);
-    if (opts.md5) {
-        const splatOpts = opts.md5.constructor === Object ? opts.md5 : {};
-        const {delimiter, length} = {delimiter: '-', length: 35, ...splatOpts};
+    if (opts.hash) {
+        const splatOpts = opts.hash.constructor === Object ? opts.hash : {};
+        const {delimiter, length, algo} = {
+            delimiter: '-',
+            length: null,
+            algo: 'md5',
+            ...splatOpts
+        };
         const [fname, ...rest] = path.basename(pathname).split('.');
-        const hsh = md5.sync(mediaPath).slice(0, Math.max(4, length));
+        hash = crypto
+            .createHash(algo)
+            .update(fileContents())
+            .digest('hex');
+
+        if (length) hash = hash.slice(0, Math.max(4, length));
 
         pathname = path.join(
             path.dirname(pathname),
-            `${fname}${delimiter}${hsh}.${rest.join('.')}`
+            `${fname}${delimiter}${hash}.${rest.join('.')}`
         );
     }
 
@@ -61,14 +75,15 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
         const {maxSize} = {maxSize: 8192, ...splatOpts};
 
         if (maxSize > fileSize) {
-            _fileBuffer = fs.readFileSync(mediaPath);
-            const b64str = _fileBuffer.toString('base64');
+            const b64str = fileContents().toString('base64');
             base64 = `data:${isVideo ? 'video' : 'image'}/${type};base64,${b64str}`;
         }
     }
 
-    if (mediaPath.toLowerCase().endsWith('.svg')) {
-        content = (_fileBuffer || fs.readFileSync(mediaPath)).toString();
+    if (opts.outputRoot) {
+        const outputPath = path.join(opts.outputRoot, pathname);
+        fs.mkdirSync(path.dirname(outputPath), {recursive: true});
+        fs.writeFileSync(outputPath, fileContents());
     }
 
     return {
@@ -79,7 +94,8 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
         aspectRatio: parseFloat((width / height).toFixed(3)),
         heightToWidthRatio: parseFloat((height / width).toFixed(3)),
         content,
-        type: type
+        type: type,
+        hash
     };
 }
 
@@ -87,6 +103,7 @@ function toBabelMediaObject(m, t) {
     return {
         pathname: t.stringLiteral(m.pathname),
         src: t.stringLiteral(m.src),
+        hash: m.hash && t.stringLiteral(m.hash),
         type: t.stringLiteral(m.type),
         width: t.numericLiteral(m.width),
         height: t.numericLiteral(m.height),
@@ -103,20 +120,22 @@ module.exports = ({types: t}) => ({
         const {
             baseDir = process.cwd(),
             pathnamePrefix = '',
+            outputRoot = null,
             imageExtensions = ['svg', 'apng', 'png', 'gif', 'jpg', 'jpeg'],
             videoExtensions = ['mp4', 'webm', 'ogv'],
-            md5 = false,
+            md5 = false, // kept for backwards compatibility, it is only ever assigned to hash below
+            hash = md5,
             base64 = false
         } = this.opts;
 
         this.normalizedOpts = {
             baseDir: path.resolve(baseDir),
+            outputRoot: outputRoot && path.resolve(outputRoot),
             pathnamePrefix,
             imageExtensions,
             videoExtensions,
-            md5,
+            hash,
             base64,
-
             imageExtensionRegex: new RegExp(`\.(?:${imageExtensions.join('|')})$`, 'i'),
             videoExtensionRegex: new RegExp(`\.(?:${videoExtensions.join('|')})$`, 'i'),
             extensionRegex: new RegExp(
