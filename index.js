@@ -31,12 +31,12 @@ function videoSize(path) {
 
 function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
     const {root, filename} = file.opts;
-    const importingFileDir = filename ? path.dirname(filename) : root;
     const mediaPath = importedPath.startsWith('/')
         ? importedPath
-        : path.resolve(path.join(importingFileDir, importedPath));
+        : path.resolve(path.join(filename ? path.dirname(filename) : root, importedPath));
     const isVideo = mediaPath.match(opts.videoExtensionRegex);
     const {width, height, type} = (isVideo ? videoSize : imgSize)(mediaPath);
+
     let pathname = mediaPath.replace(opts.baseDir, '');
     let _fileBuffer = null;
     let content = undefined;
