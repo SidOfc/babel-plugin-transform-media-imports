@@ -13,13 +13,13 @@ function transform(code, options = {}) {
 }
 
 describe('babel-plugin-transform-media-imports', function() {
-    it('can default export a media file using named exports', function() {
+    it('can get dimensions from a video file with ffprobe', function() {
         if (!executable('ffprobe')) return this.skip();
 
         assert.equal(
-            transform('export {default} from "test/files/media-file.webm"'),
+            transform('import video from "test/files/media-file.webm"'),
             [
-                'export default {',
+                'var video = {',
                 '  pathname: "/test/files/media-file.webm",',
                 '  src: "/test/files/media-file.webm",',
                 '  type: "webm",',
@@ -29,6 +29,37 @@ describe('babel-plugin-transform-media-imports', function() {
                 '  heightToWidthRatio: 0.234',
                 '};'
             ].join('\n')
+        );
+    });
+
+    it('can default export a media file using named exports', function() {
+        assert.equal(
+            transform('export {default} from "test/files/media-file.jpg"'),
+            [
+                'export default {',
+                '  pathname: "/test/files/media-file.jpg",',
+                '  src: "/test/files/media-file.jpg",',
+                '  type: "jpg",',
+                '  width: 280,',
+                '  height: 280,',
+                '  aspectRatio: 1,',
+                '  heightToWidthRatio: 1',
+                '};'
+            ].join('\n')
+        );
+    });
+
+    it('can export a specific property from a media file using named exports', function() {
+        assert.equal(
+            transform('export {width} from "test/files/media-file.jpg"'),
+            'export const width = 280;'
+        );
+    });
+
+    it('can export a specific property from a media file using named exports with "as"', function() {
+        assert.equal(
+            transform('export {width as w} from "test/files/media-file.jpg"'),
+            'export const w = 280;'
         );
     });
 

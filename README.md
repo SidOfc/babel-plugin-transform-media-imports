@@ -35,14 +35,53 @@ var avatar = {
 };
 ```
 
-## Binary dependencies
+# Table of Contents
+
+- [babel-plugin-transform-media-imports](#babel-plugin-transform-media-imports)
+- [Table of Contents](#table-of-contents)
+- [Changelog](#changelog)
+    - [08-08-2019 v1.2.0](#08-08-2019-v120)
+    - [05-08-2019 v1.1.1](#05-08-2019-v111)
+- [Binary dependencies](#binary-dependencies)
+- [Installation](#installation)
+- [Usage](#usage)
+    - [Importing an image](#importing-an-image)
+    - [Exporting an image](#exporting-an-image)
+    - [Importing specific properties](#importing-specific-properties)
+    - [Exporting specific properties](#exporting-specific-properties)
+- [Configuration](#configuration)
+    - [baseDir](#basedir)
+    - [pathnamePrefix](#pathnameprefix)
+    - [outputRoot](#outputroot)
+    - [imageExtensions](#imageextensions)
+    - [videoExtensions](#videoextensions)
+    - [hash](#hash)
+    - [base64](#base64)
+
+# Changelog
+
+_dates are listed in dd-mm-yyyy format_
+
+### 08-08-2019 v1.2.0
+
+- Add ability to output files with [outputRoot](#outputroot).
+- Remove `md5-file` dependency, it's only 1 dep now :boom:.
+- Make `.svg` file content available through a `content` property.
+- Rename `md5` option to `hash`, `md5` now gets aliassed to `hash` for backwards compat.
+    - Add `algo` option to specify a valid node crypto hash algorithm.
+
+### 05-08-2019 v1.1.1
+
+- Added meta information
+
+# Binary dependencies
 
 This plugin depends on `ffprobe` to be installed and executable on the system
 in order to get information about video formats such as `mp4` and `webm`.
 `ffprobe` comes installed with [`ffmpeg`](https://ffmpeg.org/download.html).
 Without `ffprobe` installed, images can still be processed.
 
-## Installation
+# Installation
 
 Add this plugin to your package / application with:
 
@@ -66,9 +105,109 @@ Afterwards, add the plugin to your `.babelrc` plugins:
 }
 ```
 
-## Configuration
+# Usage
 
-This is the default configuration of the plugin:
+After following the [installation](#installation) steps above, you can now directly `import`
+images and videos into your JS files. This will result in an object with some useful properties:
+
+- `pathname` the path of the file with [baseDir](#basedir) removed and [pathnamePrefix](#pathnameprefix) prepended.
+- `src` the same as `pathname` unless [base64](#base64) was specified and the file size was less than `base64.maxSize`.
+- `hash` when [hash](#hash) is enabled, this property contains the generated hash, `undefined` otherwise.
+- `type` type of the media file, e.g. `'jpg'`, `'svg'`, `'mp4'`
+- `width` width in pixels of the media file
+- `height` height in pixels of the media file
+- `content` if the file is an `svg`, the `content` property will contain the raw svg file contents.
+- `aspectRatio` calculated aspect ratio using `width / height` rounded to 3 decimal places.
+- `heightToWidthRatio` calculated ratio using `height / width` rounded to 3 decimal places.<br>
+  (useful for ::after padding aspect ratio hack)
+
+## Importing an image
+
+To `import` an image including all its properties:
+
+```js
+import image from 'path/to/image.jpg';
+```
+
+Which will be transformed into:
+
+```js
+var image = {
+    pathname: 'path/to/image.jpg',
+    src: 'path/to/image.jpg',
+    width: 1234,
+    height: 1234,
+    aspectRatio: 1,
+    heightToWidthRatio: 1,
+    type: 'jpg'
+};
+```
+
+## Exporting an image
+
+To `export` an image including all its properties:
+
+```js
+export {default as image} from 'path/to/image.jpg';
+```
+
+When using [\@babel/plugin-proposal-export-default-from](https://babeljs.io/docs/en/next/babel-plugin-proposal-export-default-from.html),
+a default export can be used instead:
+
+```js
+export image from 'path/to/image.jpg';
+```
+
+Either will be transformed into:
+
+```js
+const _image = {
+    pathname: 'path/to/image.jpg',
+    src: 'path/to/image.jpg',
+    width: 1234,
+    height: 1234,
+    aspectRatio: 1,
+    heightToWidthRatio: 1,
+    type: 'jpg'
+};
+export { _image as image };
+```
+
+## Importing specific properties
+
+If you only need to `import` a specific property, members may be imported using named imports:
+
+```js
+import {width, height, heightToWidthRatio} from 'path/to/image.jpg';
+```
+
+Which will be transformed into:
+
+```js
+const width = 1234;
+const height = 1234;
+const heightToWidthRatio = 1;
+```
+
+## Exporting specific properties
+
+If you only need to `export` a specific property, members may be exported using named exports:
+
+```js
+export {width, height, heightToWidthRatio} from 'path/to/image.jpg';
+```
+
+Which will be transformed into:
+
+```js
+export const width = 1234;
+export const height = 1234;
+export const heightToWidthRatio = 1;
+```
+
+# Configuration
+
+This is the default configuration of the plugin, each option is detailed below:
 
 ```js
 [
@@ -76,51 +215,54 @@ This is the default configuration of the plugin:
     {
         baseDir: process.cwd(),
         pathnamePrefix: '',
+        outputRoot: null,
         imageExtensions: ['svg', 'apng', 'png', 'gif', 'jpg', 'jpeg'],
         videoExtensions: ['mp4', 'webm', 'ogv'],
-        md5: false,
+        hash: false,
         base64: false
     }
 ]
 ```
 
-### baseDir
+## baseDir
 
 **default**: `process.cwd()`
 
 Everything before this path gets removed from the `src` and `pathname` attributes.
 
-### pathnamePrefix
+## pathnamePrefix
 
 **default**: `''`
 
 After removing the [`baseDir`](#basedir), the `pathnamePrefix` gets _prepended_ to
 the `src` and `pathname` attributes.
 
-### outputRoot
+## outputRoot
 
 **default**: `null`
 
 When specified, writes output file(s) to `outputRoot/{pathname}` where `pathname`
 is the specified media file's `pathname` attribute.
 
-### imageExtensions
+## imageExtensions
 
 **default**: `['svg', 'apng', 'png', 'gif', 'jpg', 'jpeg']`
 
 Specify supported image extensions that will be transformed.
 
-### videoExtensions
+## videoExtensions
 
 **default**: `['mp4', 'webm', 'ogv']`
 
 Specify supported video extensions that will be transformed.
 
-### md5
+## hash
+
+_formerly named `md5`, the old name is still supported and will work the same way_
 
 **default**: `null`
 
-When set to `true`, adds an md5 hash to the `src` and `pathname` attributes:
+When set to `true`, adds a hash to the `src` and `pathname` attributes:
 
 ```js
 import {pathname} from 'avatar.jpg';
@@ -138,7 +280,8 @@ are configurable:
 ```js
 {
     length: 10, // trims md5 length to first <N> characters
-    delimiter: '.' // delimiter to join filename and md5: [filename][delimiter][md5].[ext]
+    delimiter: '.', // delimiter to join filename and md5: [filename][delimiter][md5].[ext]
+    algo: 'md5' // a valid node 'crypto' createHash algorithm such as md5 or sha256, defaults to md5
 }
 ```
 
@@ -148,8 +291,7 @@ After applying the above configuration the import looks like this:
 const pathname = 'avatar.3h2jk5gjkh.jpg'
 ```
 
-
-### base64
+## base64
 
 **default**: `null`
 
@@ -173,4 +315,3 @@ When set to an object, the `maxSize` of `8192` may be overridden:
     maxSize: 10000 // allow files up to 10kb to be transformed to base64
 }
 ```
-
