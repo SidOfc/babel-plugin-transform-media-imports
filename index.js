@@ -121,7 +121,7 @@ module.exports = ({types: t}) => ({
             baseDir = process.cwd(),
             pathnamePrefix = '',
             outputRoot = null,
-            imageExtensions = ['svg', 'apng', 'png', 'gif', 'jpg', 'jpeg'],
+            imageExtensions = ['jpeg', ...imgSize.types],
             videoExtensions = ['mp4', 'webm', 'ogv'],
             md5 = false, // kept for backwards compatibility, it is only ever assigned to hash below
             hash = md5,

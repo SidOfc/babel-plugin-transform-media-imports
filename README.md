@@ -246,9 +246,12 @@ is the specified media file's `pathname` attribute.
 
 ## imageExtensions
 
-**default**: `['svg', 'apng', 'png', 'gif', 'jpg', 'jpeg']`
+**default**: `['jpeg', ...require('image-size').types]`
 
 Specify supported image extensions that will be transformed.
+By default, all extensions that [`image-size`](https://github.com/image-size/image-size)
+supports are added to the list in addition to prepending `'jpeg'` to allow
+for regex matching of files using that extension as well.
 
 ## videoExtensions
 
