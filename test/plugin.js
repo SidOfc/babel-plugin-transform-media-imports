@@ -74,7 +74,7 @@ describe('babel-plugin-transform-media-imports', function() {
         const svgContent = fs
             .readFileSync('test/files/media-file.svg')
             .toString()
-            .replace(/(?<!\\)"/g, '\\"')
+            .replace(/"/g, (m, x, subject) => (subject[x - 1] === '\\' ? m : `\\${m}`))
             .replace(/\n/g, '\\n');
 
         assert.equal(
