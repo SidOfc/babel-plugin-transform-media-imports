@@ -248,23 +248,23 @@ describe('babel-plugin-transform-media-imports', function() {
 
             it('skips files > 8kb by default', function() {
                 assert.equal(
-                    transform('import {src} from "test/files/media-file.webm"', {
+                    transform('import {src} from "test/files/media-file.large.jpg"', {
                         base64: true
                     }),
-                    'var src = "/test/files/media-file.webm";'
+                    'var src = "/test/files/media-file.large.jpg";'
                 );
             });
 
             it('can override the maximum with {base64: {maxSize: <positive number>}}', function() {
                 const b64str = Buffer.from(
-                    fs.readFileSync('test/files/media-file.webm')
+                    fs.readFileSync('test/files/media-file.large.jpg')
                 ).toString('base64');
 
                 assert.equal(
-                    transform('import {src} from "test/files/media-file.webm"', {
-                        base64: {maxSize: 10000}
+                    transform('import {src} from "test/files/media-file.large.jpg"', {
+                        base64: {maxSize: 20000}
                     }),
-                    `var src = "data:video/webm;base64,${b64str}";`
+                    `var src = "data:image/jpg;base64,${b64str}";`
                 );
             });
         });
