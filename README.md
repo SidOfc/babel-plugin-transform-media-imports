@@ -1,4 +1,4 @@
-# babel-plugin-transform-media-imports [![Build Status](https://travis-ci.org/SidOfc/babel-plugin-transform-media-imports.svg?branch=master)](https://travis-ci.org/SidOfc/babel-plugin-transform-media-imports)
+# babel-plugin-transform-media-imports ![npm](https://img.shields.io/npm/v/babel-plugin-transform-media-imports) [![Build Status](https://travis-ci.org/SidOfc/babel-plugin-transform-media-imports.svg?branch=master)](https://travis-ci.org/SidOfc/babel-plugin-transform-media-imports)
 
 When building an application using server-side rendering, the need to
 calculate aspect ratio's from image or video files in order to prevent
