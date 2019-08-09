@@ -2,6 +2,7 @@ import assert from 'assert';
 import * as babel from '@babel/core';
 import {sync as executable} from 'hasbin';
 import fs from 'fs';
+import rimraf from 'rimraf';
 import path from 'path';
 import {execFileSync} from 'child_process';
 
@@ -146,11 +147,13 @@ describe('babel-plugin-transform-media-imports', function() {
 
         describe('outputRoot', function() {
             it('writes imported media file to specified directory', function() {
-                transform('import {pathname} from "test/files/media-file.svg"', {
-                    outputRoot: 'test/fake-root'
-                });
+                return rimraf('test/fake-root/test', () => {
+                    transform('import {pathname} from "test/files/media-file.svg"', {
+                        outputRoot: 'test/fake-root'
+                    });
 
-                assert(fs.existsSync('test/fake-root/test/files/media-file.svg'));
+                    assert(fs.existsSync('test/fake-root/test/files/media-file.svg'));
+                });
             });
         });
 

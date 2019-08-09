@@ -31,10 +31,12 @@
     "choma": "^1.2.1",
     "hasbin": "^1.2.3",
     "mocha": "^6.2.0",
-    "prettier": "^1.18.2"
+    "prettier": "^1.18.2",
+    "rimraf": "^2.6.3"
   },
   "dependencies": {
-    "image-size": "^0.7.4"
+    "image-size": "^0.7.4",
+    "mkdirp": "^0.5.1"
   },
   "prettier": {
     "tabWidth": 4,

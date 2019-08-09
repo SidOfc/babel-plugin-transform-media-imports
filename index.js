@@ -1,4 +1,5 @@
 const path = require('path');
+const mkdirp = require('mkdirp');
 const imgSize = require('image-size');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -82,7 +83,7 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
 
     if (opts.outputRoot) {
         const outputPath = path.join(opts.outputRoot, pathname);
-        fs.mkdirSync(path.dirname(outputPath), {recursive: true});
+        mkdirp.sync(path.dirname(outputPath));
         fs.writeFileSync(outputPath, fileContents());
     }
 
