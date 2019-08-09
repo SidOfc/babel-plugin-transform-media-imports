@@ -1,4 +1,4 @@
-# babel-plugin-transform-media-imports
+# babel-plugin-transform-media-imports [![Build Status](https://travis-ci.org/SidOfc/babel-plugin-transform-media-imports.svg?branch=master)](https://travis-ci.org/SidOfc/babel-plugin-transform-media-imports)
 
 When building an application using server-side rendering, the need to
 calculate aspect ratio's from image or video files in order to prevent
@@ -37,12 +37,14 @@ var avatar = {
 
 # Table of Contents
 
-- [babel-plugin-transform-media-imports](#babel-plugin-transform-media-imports)
+- [babel-plugin-transform-media-imports](#babel-plugin-transform-media-imports-)
 - [Table of Contents](#table-of-contents)
 - [Changelog](#changelog)
+    - [09-08-2019 v1.3.0](#09-08-2019-v130)
     - [08-08-2019 v1.2.0](#08-08-2019-v120)
     - [05-08-2019 v1.1.1](#05-08-2019-v111)
 - [Binary dependencies](#binary-dependencies)
+- [Node support](#node-support)
 - [Installation](#installation)
 - [Usage](#usage)
     - [Importing an image](#importing-an-image)
@@ -62,6 +64,11 @@ var avatar = {
 
 _dates are listed in dd-mm-yyyy format_
 
+### 09-08-2019 v1.3.0
+
+- Add `mkdirp` dependency, back to 2 deps :/
+- Fix issues with creating directories recursively in older (< 10.0.0) node versions
+
 ### 08-08-2019 v1.2.0
 
 - Add ability to output files with [outputRoot](#outputroot).
@@ -80,6 +87,16 @@ This plugin depends on `ffprobe` to be installed and executable on the system
 in order to get information about video formats such as `mp4` and `webm`.
 `ffprobe` comes installed with [`ffmpeg`](https://ffmpeg.org/download.html).
 Without `ffprobe` installed, images can still be processed.
+
+# Node support
+
+This plugin is tested in the following NodeJS versions:
+
+- Node.js 12.0.0
+- Node.js 11.0.0
+- Node.js 10.0.0
+- Node.js 9.0.0
+- Node.js 8.0.0
 
 # Installation
 
