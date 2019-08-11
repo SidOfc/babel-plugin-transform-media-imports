@@ -233,7 +233,7 @@ This is the default configuration of the plugin, each option is detailed below:
         baseDir: process.cwd(),
         pathnamePrefix: '',
         outputRoot: null,
-        imageExtensions: ['svg', 'apng', 'png', 'gif', 'jpg', 'jpeg'],
+        imageExtensions: ['jpeg', 'apng', ...require('image-size').types],
         videoExtensions: ['mp4', 'webm', 'ogv'],
         hash: false,
         base64: false
