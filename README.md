@@ -1,5 +1,9 @@
 # babel-plugin-transform-media-imports ![npm](https://img.shields.io/npm/v/babel-plugin-transform-media-imports) [![Build Status](https://travis-ci.org/SidOfc/babel-plugin-transform-media-imports.svg?branch=master)](https://travis-ci.org/SidOfc/babel-plugin-transform-media-imports)
 
+_note:_ If you are reading this on npm, please note that this README is only updated
+_per release_. Sometimes deficiencies in the README are fixed in master but not yet
+published so make sure to check the github (and open an issue :D) page if something here is incorrect!
+
 When building an application using server-side rendering, the need to
 calculate aspect ratio's from image or video files in order to prevent
 layout jank often arises.
