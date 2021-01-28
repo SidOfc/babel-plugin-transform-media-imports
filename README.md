@@ -41,7 +41,7 @@ var avatar = {
 
 # Table of Contents
 
-- [babel-plugin-transform-media-imports](#babel-plugin-transform-media-imports-)
+- [babel-plugin-transform-media-imports](#babel-plugin-transform-media-imports)
 - [Table of Contents](#table-of-contents)
 - [Changelog](#changelog)
     - [09-08-2019 v1.3.0](#09-08-2019-v130)
@@ -96,11 +96,15 @@ Without `ffprobe` installed, images can still be processed.
 
 This plugin is tested in the following NodeJS versions:
 
+- Node.js 15.0.0
+- Node.js 14.0.0
+- Node.js 13.0.0
 - Node.js 12.0.0
 - Node.js 11.0.0
-- Node.js 10.0.0
-- Node.js 9.0.0
-- Node.js 8.0.0
+- Node.js 10.15.0
+
+The plugin itself may work in older versions such as node 9 or maybe even 8
+but mocha requires at least node version 10.13 for running tests.
 
 # Installation
 
