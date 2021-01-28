@@ -44,6 +44,7 @@ var avatar = {
 - [babel-plugin-transform-media-imports](#babel-plugin-transform-media-imports)
 - [Table of Contents](#table-of-contents)
 - [Changelog](#changelog)
+    - [28-01-2021 v1.4.0](#28-01-2021-v140)
     - [09-08-2019 v1.3.0](#09-08-2019-v130)
     - [08-08-2019 v1.2.0](#08-08-2019-v120)
     - [05-08-2019 v1.1.1](#05-08-2019-v111)
@@ -67,6 +68,10 @@ var avatar = {
 # Changelog
 
 _dates are listed in dd-mm-yyyy format_
+
+### 28-01-2021 v1.4.0
+
+- Update dependencies (should have been a patch update, woops!)
 
 ### 09-08-2019 v1.3.0
 
