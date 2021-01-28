@@ -18,14 +18,11 @@ function videoSize(path) {
         'v:0',
         '-show_entries',
         'stream=height,width',
-        path
+        path,
     ]).toString();
     const width = parseInt(/width=(\d+)/.exec(result)[1] || 0);
     const height = parseInt(/height=(\d+)/.exec(result)[1] || 0);
-    const type = path
-        .split('.')
-        .pop()
-        .toLowerCase();
+    const type = path.split('.').pop().toLowerCase();
 
     return {width, height, type};
 }
@@ -54,13 +51,10 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
             delimiter: '-',
             length: null,
             algo: 'md5',
-            ...splatOpts
+            ...splatOpts,
         };
         const [fname, ...rest] = path.basename(pathname).split('.');
-        hash = crypto
-            .createHash(algo)
-            .update(fileContents())
-            .digest('hex');
+        hash = crypto.createHash(algo).update(fileContents()).digest('hex');
 
         if (length) hash = hash.slice(0, Math.max(4, length));
 
@@ -96,7 +90,7 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
         heightToWidthRatio: parseFloat((height / width).toFixed(3)),
         content,
         type: type,
-        hash
+        hash,
     };
 }
 
@@ -110,7 +104,7 @@ function toBabelMediaObject(m, t) {
         height: t.numericLiteral(m.height),
         aspectRatio: t.numericLiteral(m.aspectRatio),
         content: m.content && t.stringLiteral(m.content),
-        heightToWidthRatio: t.numericLiteral(m.heightToWidthRatio)
+        heightToWidthRatio: t.numericLiteral(m.heightToWidthRatio),
     };
 }
 
@@ -126,7 +120,7 @@ module.exports = ({types: t}) => ({
             videoExtensions = ['mp4', 'webm', 'ogv'],
             md5 = false, // kept for backwards compatibility, it is only ever assigned to hash below
             hash = md5,
-            base64 = false
+            base64 = false,
         } = this.opts;
 
         this.normalizedOpts = {
@@ -142,7 +136,7 @@ module.exports = ({types: t}) => ({
             extensionRegex: new RegExp(
                 '\\.(?:' + [...imageExtensions, ...videoExtensions].join('|') + ')$',
                 'i'
-            )
+            ),
         };
     },
 
@@ -152,7 +146,7 @@ module.exports = ({types: t}) => ({
             if (!p.node.source) return;
             const {
                 specifiers,
-                source: {value: rawExportPath}
+                source: {value: rawExportPath},
             } = p.node;
 
             if (rawExportPath.match(this.normalizedOpts.extensionRegex)) {
@@ -180,13 +174,13 @@ module.exports = ({types: t}) => ({
 
                 if (namedExports.length) {
                     transforms.push(
-                        ...namedExports.map(namedExport =>
+                        ...namedExports.map((namedExport) =>
                             t.exportNamedDeclaration(
                                 t.variableDeclaration('const', [
                                     t.variableDeclarator(
                                         t.identifier(namedExport.exported.name),
                                         media[namedExport.local.name]
-                                    )
+                                    ),
                                 ]),
                                 []
                             )
@@ -205,7 +199,7 @@ module.exports = ({types: t}) => ({
             const transforms = [];
             const {
                 specifiers,
-                source: {value: rawImportPath}
+                source: {value: rawImportPath},
             } = p.node;
 
             if (rawImportPath.match(this.normalizedOpts.extensionRegex)) {
@@ -228,20 +222,20 @@ module.exports = ({types: t}) => ({
                                             t.objectProperty(t.identifier(k), v)
                                         )
                                 )
-                            )
+                            ),
                         ])
                     );
                 }
 
                 transforms.push(
                     ...namedImports
-                        .filter(namedImport => media[namedImport.imported.name])
-                        .map(namedImport =>
+                        .filter((namedImport) => media[namedImport.imported.name])
+                        .map((namedImport) =>
                             t.variableDeclaration('const', [
                                 t.variableDeclarator(
                                     t.identifier(namedImport.local.name),
                                     media[namedImport.imported.name]
-                                )
+                                ),
                             ])
                         )
                 );
@@ -251,6 +245,6 @@ module.exports = ({types: t}) => ({
                 p.replaceWithMultiple(transforms);
                 p.skip();
             }
-        }
-    }
+        },
+    },
 });

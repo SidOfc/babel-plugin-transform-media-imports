@@ -24,19 +24,19 @@
     "video"
   ],
   "devDependencies": {
-    "@babel/core": "^7.9.0",
-    "@babel/plugin-proposal-export-default-from": "^7.8.3",
-    "@babel/preset-env": "^7.9.0",
-    "@babel/register": "^7.9.0",
+    "@babel/core": "^7.12.10",
+    "@babel/plugin-proposal-export-default-from": "^7.12.1",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/register": "^7.12.10",
     "choma": "^1.2.1",
     "hasbin": "^1.2.3",
-    "mocha": "^6.2.3",
-    "prettier": "^1.19.1",
-    "rimraf": "^2.7.1"
+    "mocha": "^8.2.1",
+    "prettier": "^2.2.1",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
-    "image-size": "^0.7.5",
-    "mkdirp": "^0.5.5"
+    "image-size": "^0.9.3",
+    "mkdirp": "^1.0.4"
   },
   "prettier": {
     "tabWidth": 4,
