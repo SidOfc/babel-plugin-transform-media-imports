@@ -101,6 +101,7 @@ Without `ffprobe` installed, images can still be processed.
 
 This plugin is tested in the following NodeJS versions:
 
+- Node.js 16.5.0
 - Node.js 15.0.0
 - Node.js 14.0.0
 - Node.js 13.0.0
