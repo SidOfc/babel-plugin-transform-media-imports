@@ -5,7 +5,7 @@ _per release_. Sometimes deficiencies in the README are fixed in master but not 
 published so make sure to check the github (and open an issue :D) page if something here is incorrect!
 
 When building an application using server-side rendering, the need to
-calculate aspect ratio's from image or video files in order to prevent
+calculate aspect ratios from image or video files in order to prevent
 layout jank often arises.
 While looking for alternatives &mdash; as to not have to write this
 myself &mdash; I stumbled upon some other packages:
