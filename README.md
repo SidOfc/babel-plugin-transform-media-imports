@@ -2,6 +2,7 @@
 
 ![Licence](https://img.shields.io/badge/license-MIT-E9573F.svg)
 [![npm](https://img.shields.io/npm/v/babel-plugin-transform-media-imports)](https://www.npmjs.com/package/babel-plugin-transform-media-imports)
+[![Issues](https://img.shields.io/github/issues/SidOfc/babel-plugin-transform-media-imports.svg)](https://github.com/SidOfc/babel-plugin-transform-media-imports/issues)
 [![Build Status](https://circleci.com/gh/SidOfc/babel-plugin-transform-media-imports.svg?style=shield)](https://app.circleci.com/pipelines/github/SidOfc/babel-plugin-transform-media-imports)
 
 _note:_ If you are reading this on npm, please note that this README is only updated
