@@ -6,13 +6,13 @@ orbs:
 workflows:
   tests:
     jobs:
-      - node/17.0.0:
+      - node/test:
           version: '17.0.0'
-      - node/16.0.0:
+      - node/test:
           version: '16.0.0'
-      - node/15.0.0:
+      - node/test:
           version: '15.0.0'
-      - node/14.0.0:
+      - node/test:
           version: '14.0.0'
-      - node/13.0.0:
+      - node/test:
           version: '13.0.0'
