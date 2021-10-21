@@ -1,4 +1,8 @@
-# babel-plugin-transform-media-imports ![npm](https://img.shields.io/npm/v/babel-plugin-transform-media-imports) [![Build Status](https://travis-ci.org/SidOfc/babel-plugin-transform-media-imports.svg?branch=master)](https://travis-ci.org/SidOfc/babel-plugin-transform-media-imports)
+# babel-plugin-transform-media-imports
+
+![Licence](https://img.shields.io/badge/license-MIT-E9573F.svg)
+[![npm](https://img.shields.io/npm/v/babel-plugin-transform-media-imports)](https://www.npmjs.com/package/babel-plugin-transform-media-imports)
+[![Build Status](https://circleci.com/gh/SidOfc/babel-plugin-transform-media-imports.svg?style=shield)](https://app.circleci.com/pipelines/github/SidOfc/babel-plugin-transform-media-imports)
 
 _note:_ If you are reading this on npm, please note that this README is only updated
 _per release_. Sometimes deficiencies in the README are fixed in master but not yet
