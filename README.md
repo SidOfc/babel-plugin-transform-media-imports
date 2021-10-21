@@ -44,12 +44,12 @@ var avatar = {
 - [babel-plugin-transform-media-imports](#babel-plugin-transform-media-imports)
 - [Table of Contents](#table-of-contents)
 - [Changelog](#changelog)
+    - [21-10-2021 v1.4.2](#21-10-2021-v142)
     - [17-07-2021 v1.4.1](#17-07-2021-v141)
     - [28-01-2021 v1.4.0](#28-01-2021-v140)
     - [09-08-2019 v1.3.0](#09-08-2019-v130)
     - [08-08-2019 v1.2.0](#08-08-2019-v120)
     - [05-08-2019 v1.1.1](#05-08-2019-v111)
-- [Binary dependencies](#binary-dependencies)
 - [Node support](#node-support)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -69,6 +69,10 @@ var avatar = {
 # Changelog
 
 _dates are listed in dd-mm-yyyy format_
+
+### 21-10-2021 v1.4.2
+
+- Replace [`image-size`](https://github.com/image-size/image-size) with [`leather`](https://github.com/SidOfc/leather), removing the need for `ffprobe` :tada:
 
 ### 17-07-2021 v1.4.1
 
@@ -95,13 +99,6 @@ _dates are listed in dd-mm-yyyy format_
 
 - Added meta information
 
-# Binary dependencies
-
-This plugin depends on `ffprobe` to be installed and executable on the system
-in order to get information about video formats such as `mp4` and `webm`.
-`ffprobe` comes installed with [`ffmpeg`](https://ffmpeg.org/download.html).
-Without `ffprobe` installed, images can still be processed.
-
 # Node support
 
 This plugin is tested in the following NodeJS versions:
@@ -111,8 +108,6 @@ This plugin is tested in the following NodeJS versions:
 - Node.js 14.0.0
 - Node.js 13.0.0
 - Node.js 12.0.0
-- Node.js 11.0.0
-- Node.js 10.15.0
 
 The plugin itself may work in older versions such as node 9 or maybe even 8
 but mocha requires at least node version 10.13 for running tests.
@@ -252,7 +247,7 @@ This is the default configuration of the plugin, each option is detailed below:
         baseDir: process.cwd(),
         pathnamePrefix: '',
         outputRoot: null,
-        imageExtensions: ['jpeg', 'apng', ...require('image-size').types],
+        imageExtensions: ['jpeg', 'apng', 'jpg', 'png', 'gif', 'svg', 'bmp', 'cur', 'ico', 'psd', 'dds'],
         videoExtensions: ['mp4', 'webm', 'ogv'],
         hash: false,
         base64: false
@@ -282,10 +277,10 @@ is the specified media file's `pathname` attribute.
 
 ## imageExtensions
 
-**default**: `['jpeg', 'apng', ...require('image-size').types]`
+**default**: `['jpeg', 'apng', 'jpg', 'png', 'gif', 'svg', 'bmp', 'cur', 'ico', 'psd', 'dds']`
 
 Specify supported image extensions that will be transformed.
-By default, all extensions that [`image-size`](https://github.com/image-size/image-size)
+By default, all extensions that [`leather`](https://github.com/SidOfc/leather)
 supports are added to the list in addition to prepending `'jpeg'` and `'apng'` to allow
 for regex matching of files using that extension as well.
 

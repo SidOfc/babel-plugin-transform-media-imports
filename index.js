@@ -1,31 +1,9 @@
 const path = require('path');
 const mkdirp = require('mkdirp');
-const imgSize = require('image-size');
+const leather = require('leather');
 const fs = require('fs');
 const crypto = require('crypto');
 const {execFileSync} = require('child_process');
-
-// get-video-dimensions package is async only which
-// makes it harder to use with babel. This is a "sync"
-// copy of the original as of 04-08-2019.
-function videoSize(path) {
-    const result = execFileSync('ffprobe', [
-        '-v',
-        'error',
-        '-of',
-        'flat=s=_',
-        '-select_streams',
-        'v:0',
-        '-show_entries',
-        'stream=height,width',
-        path,
-    ]).toString();
-    const width = parseInt(/width=(\d+)/.exec(result)[1] || 0);
-    const height = parseInt(/height=(\d+)/.exec(result)[1] || 0);
-    const type = path.split('.').pop().toLowerCase();
-
-    return {width, height, type};
-}
 
 function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
     const {root, filename} = file.opts;
@@ -34,7 +12,7 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
         : path.resolve(path.join(filename ? path.dirname(filename) : root, importedPath));
     const isVideo = mediaPath.match(opts.videoExtensionRegex);
     const isSVG = mediaPath.toLowerCase().endsWith('.svg');
-    const {width, height, type} = (isVideo ? videoSize : imgSize)(mediaPath);
+    const {width, height, mime, size} = leather.attributes(mediaPath);
 
     let pathname = mediaPath.replace(opts.baseDir, '');
     let _fileBuffer;
@@ -66,12 +44,11 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
 
     if (opts.base64) {
         const splatOpts = opts.base64.constructor === Object ? opts.base64 : {};
-        const fileSize = fs.statSync(mediaPath).size;
         const {maxSize} = {maxSize: 8192, ...splatOpts};
 
-        if (maxSize > fileSize) {
+        if (maxSize > size) {
             const b64str = fileContents().toString('base64');
-            base64 = `data:${isVideo ? 'video' : 'image'}/${type};base64,${b64str}`;
+            base64 = `data:${mime};base64,${b64str}`;
         }
     }
 
@@ -89,7 +66,7 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
         aspectRatio: parseFloat((width / height).toFixed(3)),
         heightToWidthRatio: parseFloat((height / width).toFixed(3)),
         content,
-        type: type,
+        type: ((mime || '').split('/').pop() || '').split('+').shift(),
         hash,
     };
 }
@@ -116,7 +93,19 @@ module.exports = ({types: t}) => ({
             baseDir = process.cwd(),
             pathnamePrefix = '',
             outputRoot = null,
-            imageExtensions = ['jpeg', 'apng', ...imgSize.types],
+            imageExtensions = [
+                'jpeg',
+                'apng',
+                'jpg',
+                'png',
+                'gif',
+                'svg',
+                'bmp',
+                'cur',
+                'ico',
+                'psd',
+                'dds',
+            ],
             videoExtensions = ['mp4', 'webm', 'ogv'],
             md5 = false, // kept for backwards compatibility, it is only ever assigned to hash below
             hash = md5,
