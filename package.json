@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-transform-media-imports",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "author": "Sidney Liebrand (https://sidneyliebrand.io)",
   "main": "index.js",
   "license": "MIT",
