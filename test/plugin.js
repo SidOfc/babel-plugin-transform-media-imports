@@ -6,10 +6,14 @@ import rimraf from 'rimraf';
 import path from 'path';
 import {execFileSync} from 'child_process';
 
-function transform(code, options = {}) {
+function transform(code, options = {}, transformOptions = {}) {
     return babel.transform(code, {
         presets: [['@babel/preset-env', {modules: false}]],
-        plugins: [['@babel/plugin-proposal-export-default-from'], ['./index', options]],
+        plugins: [
+            ...(transformOptions.pluginsBefore ?? []),
+            ['./index', options],
+            ...(transformOptions.pluginsAfter ?? []),
+        ],
     }).code;
 }
 
@@ -274,9 +278,13 @@ describe('babel-plugin-transform-media-imports', function () {
     describe('with @babel/plugin-proposal-export-default-from', function () {
         it('can default export a media file using default export from', function () {
             assert.equal(
-                transform('export mediaFile from "test/files/media-file.jpg"'),
+                transform(
+                    'export mediaFile from "test/files/media-file.jpg"',
+                    {},
+                    {pluginsBefore: ['@babel/plugin-proposal-export-default-from']}
+                ),
                 [
-                    'var _mediaFile = {',
+                    'export default {',
                     '  pathname: "/test/files/media-file.jpg",',
                     '  src: "/test/files/media-file.jpg",',
                     '  type: "jpeg",',
@@ -285,7 +293,6 @@ describe('babel-plugin-transform-media-imports', function () {
                     '  aspectRatio: 1,',
                     '  heightToWidthRatio: 1',
                     '};',
-                    'export { _mediaFile as mediaFile };',
                 ].join('\n')
             );
         });
