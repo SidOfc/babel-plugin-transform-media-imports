@@ -1,6 +1,6 @@
 {
     "name": "babel-plugin-transform-media-imports",
-    "version": "1.4.6",
+    "version": "1.4.7",
     "description": "Yet another one of those image/video import plugins",
     "author": "Sidney Liebrand (https://sidneyliebrand.io)",
     "main": "index.js",
