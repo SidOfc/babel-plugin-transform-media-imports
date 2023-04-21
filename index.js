@@ -1,5 +1,5 @@
 const path = require('path');
-const mkdirp = require('mkdirp');
+const {mkdirp} = require('mkdirp');
 const leather = require('leather');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -12,7 +12,7 @@ function createMediaObject(importedPath, {file, normalizedOpts: opts}) {
         : path.resolve(path.join(filename ? path.dirname(filename) : root, importedPath));
     const isVideo = mediaPath.match(opts.videoExtensionRegex);
     const isSVG = mediaPath.toLowerCase().endsWith('.svg');
-    const {width, height, mime, size} = leather.attributes(mediaPath);
+    const {width, height, mime, size} = leather.readMediaAttributes(mediaPath);
 
     let pathname = mediaPath.replace(opts.baseDir, '');
     let _fileBuffer;

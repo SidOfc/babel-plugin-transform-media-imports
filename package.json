@@ -33,11 +33,11 @@
         "hasbin": "^1.2.3",
         "mocha": "^10.0.0",
         "prettier": "^2.3.2",
-        "rimraf": "^3.0.2"
+        "rimraf": "^5.0.0"
     },
     "dependencies": {
-        "leather": "^2.0.0",
-        "mkdirp": "^1.0.4"
+        "leather": "^3.0.0",
+        "mkdirp": "^3.0.0"
     },
     "prettier": {
         "tabWidth": 4,
